@@ -1,4 +1,4 @@
-import {prepareStartForm} from './startup';
+import {prepareStartForm, loginOverlay} from './startup';
 import {generatePlayerName, randInt} from './helpers';
 import {initPlayer, decode} from './modules/websocket';
 
@@ -40,6 +40,10 @@ window.addEventListener('resize', () => {
     resize();
 });
 
+loginOverlay.addEventListener('click', e => {
+    addDot(e.clientX, e.clientY, 0, 0);
+});
+
 function resize() {
     camera.width = window.innerWidth;
     camera.height = window.innerHeight;
@@ -47,20 +51,18 @@ function resize() {
 
 const dots: [number, number, number, number, number, number][] = [];
 
-function addDot() {
+function addDot(x: number = randInt(0, 1920), y: number = randInt(0, 1080), xV: number = randInt(-2, 3), yV: number = randInt(-2, 3)) {
     dots.push([
-        randInt(0, 1920), //x
-        randInt(0, 1080), //y
-        randInt(-2, 3),
-        randInt(-2, 3),
+        x, //x
+        y, //y
+        xV,
+        yV,
         randInt(0, 360), //HSL hue
         1 //Current size
     ]);
-
-    if(renderBubbles) setTimeout(addDot, randInt(50, 200));
 }
 
-addDot();
+setInterval(addDot, 100);
 
 function render() {
     camera_ctx.fillStyle = "#444";

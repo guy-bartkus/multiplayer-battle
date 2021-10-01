@@ -1,7 +1,7 @@
 import {generatePlayerName} from './helpers';
 import {startGame} from './index';
 
-const loginOverlay = document.getElementById('login-overlay')!;
+export const loginOverlay = document.getElementById('login-overlay')!;
 const startButton = document.getElementById('start-game')!;
 const generateNameButton = document.getElementById('generate-name')!;
 const username = document.getElementById('username') as HTMLInputElement;
