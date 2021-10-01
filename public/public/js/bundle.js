@@ -8,6 +8,11 @@ var mouse = {
     x: 0,
     y: 0
 };
+function startGame() {
+    var _a;
+    var username = (_a = document.getElementById("username")) === null || _a === void 0 ? void 0 : _a.textContent;
+    console.log(username);
+}
 camera.addEventListener('mousemove', function (e) {
     mouse.x = e.clientX;
     mouse.y = e.clientY;

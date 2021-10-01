@@ -8,6 +8,12 @@ const mouse = {
     y: 0
 }
 
+function handleSubmit() {
+    event?.preventDefault();
+    const username = document.getElementById("username")?.textContent;
+    console.log(username);
+}
+
 camera.addEventListener('mousemove', e => {
     mouse.x = e.clientX;
     mouse.y = e.clientY;
@@ -39,5 +45,7 @@ function render() {
 
 resize();
 render();
+
+
 
 const ws = new WebSocket(`ws://${window.location.host}`);

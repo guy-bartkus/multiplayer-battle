@@ -8,10 +8,10 @@
     <body>
         <canvas></canvas>
         <div id="login-overlay">
-            <form onsubmit="event.preventDefault();" class="d-flex">
+            <form onsubmit="handleSubmit();" class="d-flex">
                 <div class="form-group">
-                    <label>Username</label>
-                    <input type="text">
+                    <label for="username">Username</label>
+                    <input name="username" id="username" type="text">
                 </div>
                 <div class="d-flex" style="place-content: flex-end;">
                     <button>Go</button>
