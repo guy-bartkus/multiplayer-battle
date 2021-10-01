@@ -1,9 +1,12 @@
 import express from 'express';
 import ws from 'ws';
 import {join} from 'path'
+import Player from './modules/player'
 import {sendInitMessage, decode, MESSAGE_TYPE} from './modules/websocket';
 
 const app = express();
+
+const players: Player[] = [];
 
 app.use(express.static(join(__dirname, '..', 'public', 'public')));
 
@@ -27,13 +30,15 @@ wss.on('connection', (socket, req) => {
     });
 
     sendInitMessage(socket);
-    console.log(`Sent init message to ${req.socket.remoteAddress}`);
 
     socket.on('message', data => {
         const [type, username] = decode((data as ArrayBuffer));
 
         if(type == MESSAGE_TYPE.INIT) {
             console.log(`Got INIT from ${req.socket.remoteAddress} (${username})`);
+            const player = new Player(socket, username);
+
+            players.push(player);
         }
     });
 });
