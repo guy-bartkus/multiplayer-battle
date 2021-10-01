@@ -1,2 +1,3 @@
 node_modules/
 **dist/
+public/pbulic/js/bundle.js
