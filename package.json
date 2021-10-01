@@ -6,7 +6,7 @@
   "scripts": {
     "build": "run-s transpile bundle",
     "transpile": "tsc -p public",
-    "bundle": "browserify public/dist/index.js -o public/public/js/bundle.js"
+    "bundle": "browserify public/dist/index.js -p tsify --debug -o public/public/js/bundle.js"
   },
   "keywords": [],
   "author": "",
@@ -14,7 +14,10 @@
   "dependencies": {
     "@types/express": "^4.17.13",
     "@types/ws": "^8.2.0",
+    "browserify": "^17.0.0",
     "express": "^4.17.1",
+    "tsify": "^5.0.4",
+    "typescript": "^4.4.3",
     "ws": "^8.2.2"
   }
 }

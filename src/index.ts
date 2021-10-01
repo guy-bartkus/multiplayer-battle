@@ -1,6 +1,7 @@
 import express from 'express';
 import ws from 'ws';
 import {join} from 'path'
+import {sendInitMessage, decode, MESSAGE_TYPE} from './modules/websocket';
 
 const app = express();
 
@@ -17,9 +18,22 @@ wss.on('listening', () => {
 });
 
 wss.on('connection', (socket, req) => {
+    socket.binaryType = "arraybuffer";
+    
     console.log(`${req.socket.remoteAddress} connected!`);
 
     socket.on('close', () => {
         console.log(`${req.socket.remoteAddress} disconnected!`);
+    });
+
+    sendInitMessage(socket);
+    console.log(`Sent init message to ${req.socket.remoteAddress}`);
+
+    socket.on('message', data => {
+        const [type, username] = decode((data as ArrayBuffer));
+
+        if(type == MESSAGE_TYPE.INIT) {
+            console.log(`Got INIT from ${req.socket.remoteAddress} (${username})`);
+        }
     });
 });
