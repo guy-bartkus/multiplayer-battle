@@ -6,7 +6,7 @@ export default class Player extends Entity {
     name: string;
     socket: WebSocket;
 
-    constructor(socket: WebSocket, position: Vec2, name: string = "Unnamed") {
+    constructor(socket: WebSocket, name: string = "Unnamed", position: Vec2 = new Vec2()) {
         super(position);
 
         this.socket = socket;

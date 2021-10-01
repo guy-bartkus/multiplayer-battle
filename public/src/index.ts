@@ -1,74 +1,20 @@
+import {prepareStartForm} from './startup';
 import {generatePlayerName, randInt} from './helpers';
 import {initPlayer, decode} from './modules/websocket';
+
+const siteLoader = document.getElementById('loader')!;
 
 const camera = document.querySelector('canvas')!;
 const map_canvas = document.createElement('canvas');
 const camera_ctx = camera.getContext('2d')!;
 const map_ctx = camera.getContext('2d')!;
 
-const siteLoader = document.getElementById('loader')!;
-
-const loginOverlay = document.getElementById('login-overlay')!;
-const startButton = document.getElementById('start-game')!;
-const generateNameButton = document.getElementById('generate-name')!;
-const username = document.getElementById('username') as HTMLInputElement;
-
-const gameChatContainer = document.getElementById('game-chat')!;
-const gameChatMessage = document.getElementById('message') as HTMLTextAreaElement;
-const sendMessageButton = document.getElementById('send-message')!;
-
-const errorDisplayContainer = document.getElementById('error-display')!;
-let errorList = [];
-
-
 const mouse = {
     x: 0,
     y: 0
-}
+};
 
 let renderBubbles = true;
-
-function prepareStartForm() {
-    startButton?.addEventListener('click', handleStart);
-    generateNameButton?.addEventListener('click', generateName);
-}
-
-function generateName() {
-    username.value = generatePlayerName();
-    username.classList.remove();
-}
-
-function hideStartForm() {
-    loginOverlay.classList.add('hidden');
-}
-function showGameChat() {
-    gameChatContainer.classList.remove('hidden');
-    sendMessageButton.addEventListener('click', sendMessage);
-}
-
-function sendMessage() {
-    if (!gameChatMessage.value.trim().length) {
-        return
-    }
-    let msg = gameChatMessage.value.trim();
-    console.log('sending msg', msg);
-
-    gameChatMessage.value = "";
-}
-
-function handleStart() {
-    username.classList.remove();
-    if (!username.value.trim().length) {
-        username.value = generatePlayerName();
-    } else if (username.value.trim().length > 20) {
-        username.classList.add("error");
-        return;
-    }
-    startGame()
-    hideStartForm();
-    showGameChat();
-    renderBubbles = false;
-}
 
 const ws = new WebSocket(`ws://${window.location.host}`);
 
@@ -78,16 +24,15 @@ ws.addEventListener('message', e => {
     });
 });
 
-function startGame() {
-    initPlayer(ws, username.value);
-    
-    return true
+export function startGame(username:string) {
+    renderBubbles = false;
+    initPlayer(ws, username);
 }
 
 camera.addEventListener('mousemove', e => {
     const rect = camera.getBoundingClientRect();
 
-    mouse.x = e.clientX - rect.left
+    mouse.x = e.clientX - rect.left;
     mouse.y = e.clientY - rect.top;
 });
 
