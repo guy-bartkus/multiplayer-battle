@@ -21,3 +21,23 @@ After cloning, run `npm install` in root of project.
 ❌ Setup canvases after getting init data from server  
 ❌ Keep player in center of canvas when moving  
 ❌ Make background canvas have grid so can see when moving  
+
+# Binary Websocket Scheme
+
+## How server/client interpret specific events
+
+### Server
+
+`INIT` - This means user is ready to join game. Data: `{username: varchar}`  
+`ROTATE` - Change user rotation. Data: `rad: float32`  
+`MOVE` - Update move point. Apply force in direction. Data: `x: uint16, y: uint16`  
+`CHAT` - Relay to other players. Data: `msg: varchar`
+
+### Client
+
+`INIT` - Contains map size data. Data: `{mapSize: uint16}`  
+`ROTATE` - Player rotate. Data: `{playerID: uint8, rad: float32}`  
+`MOVE` - Player movement data. Data: `{playerID: Uint8, x: uint16, y: uint16, dX: uint16, dY: uint16, last: uint8}`  
+`CHAT` - Display another player's chat. Data: `{playerID: uint8, msg: varchar}`  
+`NEW_PLY` - Add new player to player list. Data: `{username: varchar}`  
+`DEL_PLY` - Remove player from player list. Data: `playerID: uint8`  

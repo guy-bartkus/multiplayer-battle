@@ -1,21 +1,42 @@
-enum MESSAGE_TYPE {
+import {Vec2} from './math'
+
+export enum MESSAGE_TYPE {
     NULL = 0,
     INIT,
-    PLAYER_UPDATE,
-    NEW_PLAYER,
-    CHAT_MESSAGE
+    ROTATE,
+    MOVE,
+    CHAT,
+    NEW_PLY,
+    DEL_PLY
 }
 
-export const decode = (msg: ArrayBuffer) => {
+export const decode = (payload: ArrayBuffer): any[] => {
+    const type = (new DataView(payload)).getUint8(0);
+    const msg = payload.slice(1, payload.byteLength)
     const dv = new DataView(msg);
-    const type = dv.getUint8(0);
 
     switch(type) {
         case MESSAGE_TYPE.INIT:
-            console.log(`Got INIT from server! Map size: ${dv.getUint16(1)}`);
+            return [type];
             break;
-        case MESSAGE_TYPE.CHAT_MESSAGE:
-            console.log(`Got chat message from server!`);
+        case MESSAGE_TYPE.CHAT:
+            return [type];
+            break;
+        case MESSAGE_TYPE.NEW_PLY:
+            {
+                const utf8decoder = new TextDecoder();
+                const username = utf8decoder.decode((new Uint8Array(msg)));
+                return [type, username];
+            }
+            break;
+        case MESSAGE_TYPE.DEL_PLY:
+            {
+                const playerID = dv.getUint8(0);
+                return [type, playerID];
+            }
+            break;
+        default:
+            return [MESSAGE_TYPE.NULL];
             break;
     }
 }
@@ -25,12 +46,22 @@ export const initPlayer = (socket: WebSocket, name: string) => {
 }
 
 export const sendChatMessage = (socket: WebSocket, msg: string) => {
-    sendMessage(socket, MESSAGE_TYPE.CHAT_MESSAGE, msg);
+    sendMessage(socket, MESSAGE_TYPE.CHAT, msg);
+}
+
+export const sendRotUpdate = (socket: WebSocket, rad: number) => {
+    const payload = new ArrayBuffer(5);
+    const dv = new DataView(payload);
+
+    dv.setUint8(0, MESSAGE_TYPE.ROTATE);
+    dv.setFloat32(1, rad);
+
+    socket.send(payload);
 }
 
 export const sendMessage = (socket: WebSocket, msgType: number, msg: string) => {
-    const message = new ArrayBuffer(1+msg.length);
-    const dv = new DataView(message);
+    const payload = new ArrayBuffer(1+msg.length);
+    const dv = new DataView(payload);
 
     dv.setUint8(0, msgType);
 
@@ -38,7 +69,5 @@ export const sendMessage = (socket: WebSocket, msgType: number, msg: string) => 
         dv.setUint8(i+1, msg.charCodeAt(i));
     }
 
-    console.log("One");
-    socket.send(message);
-    console.log("Two");
+    socket.send(payload);
 }

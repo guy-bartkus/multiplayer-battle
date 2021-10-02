@@ -17,7 +17,33 @@ body {
   padding: 0;
   background: #333;
   display: flex;
+  flex-direction: column;
 }
+
+canvas {
+  background: #444;
+  cursor: none;
+}
+
+.hidden {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+#loader {
+  background: #000;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  place-content: center;
+  color: #fff;
+  transition: opacity 0.5s linear;
+}
+
 .btn {
   padding: 10px 16px;
   border: 0;
@@ -48,10 +74,58 @@ body {
   }
 }
 
-canvas {
-  background: #444;
-  cursor: none;
+
+
+
+
+
+form {
+  .error-message {
+    display: none;
+    color: red;
+    font-size: 80%;
+  }
+  label {
+    text-shadow: 0 1px rgba(0, 0, 0, 0.9);
+  }
+  input, textarea {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 6px 10px;
+    border: 0;
+    color: #fff;
+
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:active {
+      box-shadow: 0 0 0px 1000px #000 inset;
+      -webkit-box-shadow: 0 0 0px 1000px #000 inset;
+      -webkit-text-fill-color: var(--placeholder-color) !important;
+    }
+
+    &::-webkit-input-placeholder,
+    &::-moz-placeholder,
+    &:-moz-placeholder,
+    &:-ms-input-placeholder,
+    &::-webkit-input-placeholder {
+      /* Chrome/Opera/Safari */
+      color: var(--placeholder-color);
+    }
+
+    
+    &.error ~ .error-message {
+      display: block;
+    }
+  } 
+  @media screen and (min-width: 680px) {
+    label,
+    input,
+    button {
+      font-size: 150%;
+    }
+  }
 }
+
 
 #login-overlay {
   --placeholder-color: #fee;
@@ -83,37 +157,6 @@ canvas {
     box-shadow: 0 0 3px #0002;
   }
 }
-/* #login-overlay label, 
-#login-overlay input, 
-#login-overlay button {
-    font-size: 200%;
-} */
-@media screen and (min-width: 680px) {
-  #login-overlay label,
-  #login-overlay input,
-  #login-overlay button {
-    font-size: 150%;
-  }
-}
-.hidden {
-  opacity: 0 !important;
-  pointer-events: none;
-}
-
-#loader {
-  background: #000;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  place-content: center;
-  color: #fff;
-  transition: opacity 0.5s linear;
-}
-
 
 #game-chat {
   background: #2225;
@@ -121,6 +164,7 @@ canvas {
   bottom: 0;
   left: 0;
   padding: 1em;
+
   #message-list {
     color: #fff;
     padding: 1em;
@@ -128,87 +172,21 @@ canvas {
     max-height: 100px;
     overflow-y: auto;
     background: rgba(0, 0, 0, 0.3);
+
     li {
       list-style-type: none;
     }
+
+  }
+
+  #message {
+    min-height: 50px;
+    max-height: 50px;
+    resize: none;
+    flex-grow: 1;
   }
 }
 
-
-#game-chat #message {
-  min-height: 50px;
-  max-height: 50px;
-  resize: none;
-  flex-grow: 1;
-}
-
-form label {
-  text-shadow: 0 1px rgba(0, 0, 0, 0.9);
-}
-
-form input,
-form textarea {
-  background: rgba(0, 0, 0, 0.3);
-  padding: 6px 10px;
-  border: 0;
-  color: #fff;
-}
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active,
-textarea:-webkit-autofill,
-textarea:-webkit-autofill:hover,
-textarea:-webkit-autofill:focus,
-textarea:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0px 1000px #000 inset;
-}
-input:-webkit-autofill,
-textarea:-webkit-autofill {
-  -webkit-text-fill-color: var(--placeholder-color) !important;
-}
-
-input::-webkit-input-placeholder {
-  /* Chrome/Opera/Safari */
-  color: var(--placeholder-color);
-}
-input::-moz-placeholder {
-  /* Firefox 19+ */
-  color: var(--placeholder-color);
-}
-input:-ms-input-placeholder {
-  /* IE 10+ */
-  color: var(--placeholder-color);
-}
-input:-moz-placeholder {
-  /* Firefox 18- */
-  color: var(--placeholder-color);
-}
-textarea::-webkit-input-placeholder {
-  /* Chrome/Opera/Safari */
-  color: var(--placeholder-color);
-}
-textarea::-moz-placeholder {
-  /* Firefox 19+ */
-  color: var(--placeholder-color);
-}
-textarea:-ms-input-placeholder {
-  /* IE 10+ */
-  color: var(--placeholder-color);
-}
-textarea:-moz-placeholder {
-  /* Firefox 18- */
-  color: var(--placeholder-color);
-}
-
-.error-message {
-  display: none;
-  color: red;
-  font-size: 80%;
-}
-input.error ~ .error-message {
-  display: block;
-}
 
 @-webkit-keyframes LoginAnimation {
   0% {
