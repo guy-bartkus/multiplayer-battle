@@ -17,4 +17,6 @@ After cloning, run `npm install` in root of project.
 ❌ Finish binary websocket protocol  
 ❌ Send mouse events to server so player can move  
 ❌ Get player updates from server and render other players  
-❌ Setup canvases after getting init data from server
+❌ Setup canvases after getting init data from server  
+❌ Keep player in center of canvas when moving
+❌ Make background canvas have grid so can see when moving

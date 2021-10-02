@@ -8,7 +8,7 @@
     "cbuild": "run-s transpile bundle",
     "transpile": "tsc -p public",
     "bundle": "browserify public/dist/index.js -p tsify --debug -o public/public/js/bundle.js",
-    "nodemon": "nodemon -e ts --exec npm run build"
+    "nodemon": "nodemon -e ts --exec npm run cbuild"
   },
   "keywords": [],
   "author": "",
