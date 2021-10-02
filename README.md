@@ -35,7 +35,7 @@ After cloning, run `npm install` in root of project.
 
 ### Client
 
-`INIT` - Contains map size data. Data: `{mapSize: uint16, }`  
+`INIT` - Contains map size data. Data: `{mapSize: uint16, [size: uint8, username: varchar]}`  
 `ROTATE` - Player rotate. Data: `{playerID: uint8, rad: float32}`  
 `MOVE` - Player movement data. Data: `{playerID: Uint8, x: uint16, y: uint16, dX: uint16, dY: uint16, last: uint8}`  
 `CHAT` - Display another player's chat. Data: `{playerID: uint8, msg: varchar}`  
