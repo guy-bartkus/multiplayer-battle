@@ -4,7 +4,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "run-s transpile bundle",
+    "sbuild": "tsc",
+    "cbuild": "run-s transpile bundle",
     "transpile": "tsc -p public",
     "bundle": "browserify public/dist/index.js -p tsify --debug -o public/public/js/bundle.js",
     "nodemon": "nodemon -e ts --exec npm run build"
