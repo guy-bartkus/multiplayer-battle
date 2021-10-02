@@ -2,7 +2,8 @@
 
 After cloning, run `npm install` in root of project.  
 `npm run sbuild` to build server typescript (src/)  
-`npm run cbuild` to build client typescript (public/src/)  
+`npm run cbuild` to build development client typescript (public/src/)  
+`npm run cbuildp` to build production client typescript (public/src/)  
 `npm run nodemon` to rebuild client when files change  
 
 # Server To-dos

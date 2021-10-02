@@ -23,22 +23,29 @@ body {
   border: 0;
   border-radius: 5px;
   cursor: pointer;
-  
-}
-.btn-primary:hover {
-  background: $color-primary-light;
-  color: #fff;
-  text-shadow: 0 1px rgba(0, 0, 0, 0.9);
-}
-.btn-secondary {
-  background: $color-secondary;
-  color: #fff;
-  text-shadow: 0 1px rgba(0, 0, 0, 0.9);
-}
-.btn-secondary:hover {
-  background: $color-secondary-light;
-  color: #fff;
-  text-shadow: 0 1px rgba(0, 0, 0, 0.9);
+
+  &-primary {
+    background: $color-primary;
+    color: #fff;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.9);
+
+    &:hover {
+      background: $color-primary-light;
+      color: #fff;
+      text-shadow: 0 1px rgba(0, 0, 0, 0.9);
+    }
+  }
+  &-secondary {
+    background: $color-secondary;
+    color: #fff;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.9);
+
+    &:hover {
+      background: $color-secondary-light;
+      color: #fff;
+      text-shadow: 0 1px rgba(0, 0, 0, 0.9);
+    }
+  }
 }
 
 canvas {
@@ -66,6 +73,15 @@ canvas {
   -webkit-animation: LoginAnimation 30s ease infinite;
   -moz-animation: LoginAnimation 30s ease infinite;
   animation: LoginAnimation 30s ease infinite;
+
+  form {
+    background: #8b458acc;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1em;
+    padding: 1em;
+    box-shadow: 0 0 3px #0002;
+  }
 }
 /* #login-overlay label, 
 #login-overlay input, 
@@ -98,14 +114,6 @@ canvas {
   transition: opacity 0.5s linear;
 }
 
-#login-overlay form {
-  background: #8b458acc;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1em;
-  padding: 1em;
-  box-shadow: 0 0 3px #0002;
-}
 
 #game-chat {
   background: #2225;
@@ -113,19 +121,19 @@ canvas {
   bottom: 0;
   left: 0;
   padding: 1em;
-}
-#game-chat #message-list {
-  color: #fff;
-  padding: 1em;
-  margin: 0;
-  max-height: 100px;
-  overflow-y: auto;
-  background: rgba(0, 0, 0, 0.3);
+  #message-list {
+    color: #fff;
+    padding: 1em;
+    margin: 0;
+    max-height: 100px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.3);
+    li {
+      list-style-type: none;
+    }
+  }
 }
 
-#game-chat #message-list li {
-  list-style-type: none;
-}
 
 #game-chat #message {
   min-height: 50px;
