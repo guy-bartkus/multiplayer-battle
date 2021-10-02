@@ -5,9 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "sbuild": "tsc",
-    "cbuild": "run-s transpile bundle",
-    "transpile": "tsc -p public",
-    "bundle": "browserify public/dist/index.js -p tsify --debug -o public/public/js/bundle.js",
+    "cbuild": "webpack --config public/webpack.config.js --mode development",
+    "cbuildp": "webpack --config public/webpack.config.js --mode production",
     "nodemon": "nodemon -e ts --exec npm run cbuild"
   },
   "keywords": [],
@@ -21,8 +20,17 @@
   "devDependencies": {
     "@types/express": "^4.17.13",
     "@types/ws": "^8.2.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "css-loader": "^6.3.0",
+    "html-webpack-plugin": "^5.3.2",
+    "mini-css-extract-plugin": "^2.3.0",
     "npm-run-all": "^4.1.5",
+    "sass": "^1.42.1",
+    "sass-loader": "^12.1.0",
+    "ts-loader": "^9.2.6",
     "tsify": "^5.0.4",
-    "typescript": "^4.4.3"
+    "typescript": "^4.4.3",
+    "webpack": "^5.56.0",
+    "webpack-cli": "^4.8.0"
   }
 }
