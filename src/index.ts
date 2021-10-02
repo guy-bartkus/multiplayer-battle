@@ -31,14 +31,18 @@ wss.on('connection', (socket, req) => {
 
     sendInitMessage(socket);
 
-    socket.on('message', data => {
-        const [type, username] = decode((data as ArrayBuffer));
+    socket.on('message', msg => {
+        const [type, data] = decode((msg as ArrayBuffer));
+        switch (type) {
+            case MESSAGE_TYPE.INIT:
+                console.log(`Got INIT from ${req.socket.remoteAddress} (${data})`);
+                const player = new Player(socket, data);
+                players.push(player);
+                break;
+            case MESSAGE_TYPE.CHAT_MESSAGE:
+                console.log(`got CHAT_MESSAGE from ${req.socket.remoteAddress} (${data})`)
 
-        if(type == MESSAGE_TYPE.INIT) {
-            console.log(`Got INIT from ${req.socket.remoteAddress} (${username})`);
-            const player = new Player(socket, username);
-
-            players.push(player);
+                break;
         }
     });
 });
