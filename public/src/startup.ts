@@ -1,5 +1,5 @@
 import {generatePlayerName} from './helpers';
-import {startGame} from './index';
+import {startGame, sendChat} from './index';
 
 export const loginOverlay = document.getElementById('login-overlay')!;
 const startButton = document.getElementById('start-game')!;
@@ -35,8 +35,7 @@ function sendMessage() {
     if (!gameChatMessage.value.trim().length) {
         return
     }
-    let msg = gameChatMessage.value.trim();
-    console.log('sending msg', msg);
+    sendChat(gameChatMessage.value.trim());
 
     gameChatMessage.value = "";
 }
@@ -49,6 +48,7 @@ function handleStart() {
         username.classList.add("error");
         return;
     }
+    console.log(username.value);
     startGame(username.value);
     hideStartForm();
     showGameChat();

@@ -1,6 +1,6 @@
 import {prepareStartForm, loginOverlay} from './startup';
 import {generatePlayerName, randInt} from './helpers';
-import {initPlayer, decode} from './modules/websocket';
+import {initPlayer, sendChatMessage, decode} from './modules/websocket';
 
 const siteLoader = document.getElementById('loader')!;
 
@@ -27,6 +27,9 @@ ws.addEventListener('message', e => {
 export function startGame(username:string) {
     renderBubbles = false;
     initPlayer(ws, username);
+}
+export function sendChat(msg:string) {
+    sendChatMessage(ws, msg);
 }
 
 camera.addEventListener('mousemove', e => {
