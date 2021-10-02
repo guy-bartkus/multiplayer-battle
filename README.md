@@ -12,6 +12,8 @@
 * avatar movement
 * avatar selection/creation
 
+
+
 # Client
 * Username prompt
 
