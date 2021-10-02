@@ -15,8 +15,18 @@ export class Vec2 {
         return new Vec2(this.x - vec2.x, this.y - vec2.y);
     }
 
-    mul(vec2: Vec2): Vec2 {
-        return new Vec2(this.x * vec2.x, this.y * vec2.y);
+    mul(mul: number): Vec2 {
+        return new Vec2(this.x * mul, this.y * mul);
+    }
+
+    div(vec2: Vec2): Vec2 {
+        return new Vec2(this.x / vec2.x, this.y / vec2.y);
+    }
+
+    normalize(): Vec2 {
+        const m = Math.sqrt(this.x**2 + this.y**2);
+
+        return new Vec2(this.x/m, this.y/m);
     }
 
     distance(vec2: Vec2): number {

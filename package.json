@@ -8,7 +8,7 @@
     "sbuild": "tsc",
     "cbuild": "webpack --config public/webpack.config.js --mode development",
     "cbuildp": "webpack --config public/webpack.config.js --mode production",
-    "nodemon": "nodemon -e ts --exec npm run cbuild",
+    "nodemon": "nodemon --watch public -e ts,html,scss --exec npm run cbuild",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run cbuild && npm run sbuild"
   },
   "keywords": [],

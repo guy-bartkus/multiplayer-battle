@@ -6,10 +6,17 @@
 }
   
 html,
-body {
+body,
+input {
   width: 100%;
   height: 100%;
   font-family: arial;
+}
+
+#player-list {
+  position: fixed;
+  color: #fff;
+  text-shadow: 1px 1px #000a;
 }
 
 body {
@@ -50,32 +57,45 @@ canvas {
   border-radius: 5px;
   cursor: pointer;
 
-  &-primary {
-    background: $color-primary;
+  &-primary, &-secondary {
     color: #fff;
     text-shadow: 0 1px rgba(0, 0, 0, 0.9);
+  }
+  &[disabled] {
+    opacity:.5;
+    cursor: default;
+  }
 
-    &:hover {
-      background: $color-primary-light;
-      color: #fff;
-      text-shadow: 0 1px rgba(0, 0, 0, 0.9);
+  &-primary {
+    background: $color-primary;
+    &:not([disabled]) {
+      &:hover {
+        background: $color-primary-light;
+      }
+      &:active {
+        background: $color-primary-dark;
+      }
     }
+    
   }
   &-secondary {
     background: $color-secondary;
-    color: #fff;
-    text-shadow: 0 1px rgba(0, 0, 0, 0.9);
-
-    &:hover {
-      background: $color-secondary-light;
-      color: #fff;
-      text-shadow: 0 1px rgba(0, 0, 0, 0.9);
+    &:not([disabled]) {
+      &:hover {
+        background: $color-secondary-light;
+      }
+      &:active {
+        background: $color-secondary-dark;
+      }
     }
   }
 }
 
 
-
+.form-group {
+  align-items: center;
+  gap: .5em;
+}
 
 
 
@@ -84,6 +104,7 @@ form {
     display: none;
     color: red;
     font-size: 80%;
+    padding: 6px 10px;
   }
   label {
     text-shadow: 0 1px rgba(0, 0, 0, 0.9);
@@ -117,13 +138,11 @@ form {
       display: block;
     }
   } 
-  @media screen and (min-width: 680px) {
-    label,
-    input,
-    button {
-      font-size: 150%;
-    }
+
+  input[type="text"] {
+    height: 18px;
   }
+  
 }
 
 
@@ -155,7 +174,35 @@ form {
     gap: 1em;
     padding: 1em;
     box-shadow: 0 0 3px #0002;
+    border-radius: 5px;
+    @media screen and (min-width:560px) {
+      gap: 2em;
+      padding: 2em;
+    }
+
+    .input-container {
+      position:relative;
+      overflow:hidden;
+    }
+    
   }
+
+  #name-list {
+    position: absolute;
+    bottom: 0;
+    padding: .35em .75em;
+    font-size:.8em;
+    p {
+      margin:0;
+      height:30px;
+    }
+    &.scrolling {
+      -webkit-animation: Scroll 1s ease-in-out;
+      -moz-animation: Scroll 1s ease-in-out;
+      animation: Scroll 1s ease-in-out;
+    }
+  }
+
 }
 
 #game-chat {
@@ -219,5 +266,31 @@ form {
   }
   100% {
     background-position: 0% 50%;
+  }
+}
+
+
+@-webkit-keyframes Scroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(582px);
+  }
+}
+@-moz-keyframes Scroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(582px);
+  }
+}
+@keyframes Scroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(582px);
   }
 }

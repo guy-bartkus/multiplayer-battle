@@ -2,6 +2,7 @@ import ws, {WebSocket} from 'ws';
 import settings from '../game-settings';
 import {Server} from 'http';
 import Player from './player';
+import {encodeBinaryStringArray} from './helpers';
 
 export enum MESSAGE_TYPE {
     NULL = 0,
@@ -23,13 +24,17 @@ export const init = (server: Server) => {
     wss.on('connection', (socket, req) => {
         socket.binaryType = "arraybuffer";
 
-        const player = new Player(socket, "");
+        const player = new Player(socket, "Unnamed User");
         const id = player.id;
         
-        console.log(`${req.socket.remoteAddress} connected!`);
+        // console.log(`${req.socket.remoteAddress} connected!`);
 
         socket.on('close', () => {
-            console.log(`${req.socket.remoteAddress} disconnected!`);
+            if(player.inList) {
+                console.log(`${player.name} left!`);
+                broadcastPlayerLeft(player.id);
+            }
+            player.removePlayer();
         });
 
         sendInitMessage(socket);
@@ -39,14 +44,16 @@ export const init = (server: Server) => {
             switch (type) {
                 case MESSAGE_TYPE.INIT:
                     {
-                        console.log(`Got INIT from ${req.socket.remoteAddress} (${data})`);
+                        console.log(`${data[0]} joined!`);
                         player.name = data[0];
+                        player.addToList();
+                        broadcastNewPlayer(player.name);
                     }
                     break;
                 case MESSAGE_TYPE.ROTATE:
                     {
-                        Player.players[id].angle = data[0];
-                        console.log(`${player.name}'s rotation is ${player.angle}'`);
+                        player.angle = data[0];
+                        //console.log(`${player.name}'s rotation is ${player.angle}'`);
                     }
                     break;
                 case MESSAGE_TYPE.CHAT:
@@ -94,7 +101,24 @@ export const decode = (payload: ArrayBuffer): any[] => {
 }
 
 export const sendInitMessage = (socket: WebSocket) => { //MESSAGE_TYPE: Uint8, MapSize: Uint16
-    const message = new ArrayBuffer(3);
+    const players: string[] = [];
+
+    let value = Player.players.values().next();
+
+    while(!value.done) {
+        const player = value.value;
+
+        players.push(player.name);
+
+        value = Player.players.values().next();
+    }
+
+    const playersBin = encodeBinaryStringArray(players);
+    const payload = new Uint8Array(3+playersBin.byteLength);
+
+    payload.set(playersBin, 3);
+
+    const message = payload.buffer;
     const dv = new DataView(message);
 
     dv.setUint8(0, MESSAGE_TYPE.INIT);
@@ -114,4 +138,27 @@ export const relayChatMessage = (socket: WebSocket, msg:string) => { //MESSAGE_T
     dv.setUint16(1, settings.mapSize);
 
     socket.send(message);
+}
+
+const broadcastPlayerLeft = (playerID: number) => {
+    const message = new ArrayBuffer(2);
+    const dv = new DataView(message);
+
+    dv.setUint8(0, MESSAGE_TYPE.DEL_PLY);
+    dv.setUint8(1, playerID);
+
+    Player.broadcastMessage(message);
+}
+
+const broadcastNewPlayer = (username: string) => {
+    const message = new ArrayBuffer(1+username.length);
+    const dv = new DataView(message);
+
+    dv.setUint8(0, MESSAGE_TYPE.NEW_PLY);
+
+    for(let i = 0; i < username.length; i++) {
+        dv.setUint8(i+1, username.charCodeAt(i));
+    }
+
+    Player.broadcastMessage(message);
 }

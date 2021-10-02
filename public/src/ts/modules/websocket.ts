@@ -1,4 +1,5 @@
 import {Vec2} from './math'
+import {decodeBinaryStringArray} from './helpers'; 
 
 export enum MESSAGE_TYPE {
     NULL = 0,
@@ -15,9 +16,15 @@ export const decode = (payload: ArrayBuffer): any[] => {
     const msg = payload.slice(1, payload.byteLength)
     const dv = new DataView(msg);
 
+    console.log(msg);
+
     switch(type) {
         case MESSAGE_TYPE.INIT:
-            return [type];
+            {
+                const mapSize = dv.getUint16(0);
+                const userList = decodeBinaryStringArray(msg.slice(2, msg.byteLength));
+                return [type, mapSize, userList];
+            }
             break;
         case MESSAGE_TYPE.CHAT:
             return [type];
@@ -57,6 +64,16 @@ export const sendRotUpdate = (socket: WebSocket, rad: number) => {
     dv.setFloat32(1, rad);
 
     socket.send(payload);
+}
+
+export const sendPosUpdate = (socket: WebSocket, pos: Vec2) => {
+    // const payload = new ArrayBuffer(5);
+    // const dv = new DataView(payload);
+
+    // dv.setUint8(0, MESSAGE_TYPE.ROTATE);
+    // dv.setFloat32(1, rad);
+
+    // socket.send(payload);
 }
 
 export const sendMessage = (socket: WebSocket, msgType: number, msg: string) => {

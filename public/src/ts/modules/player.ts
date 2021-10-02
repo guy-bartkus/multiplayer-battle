@@ -5,18 +5,18 @@ export default class Player extends Entity {
     name: string;
     id: number;
 
-    static players: Player[] = [];
+    static players: Map<number, Player> = new Map(); //id: Player
 
-    constructor(name: string = "", position: Vec2 = new Vec2()) {
+    constructor(id: number, name: string = "", position: Vec2 = new Vec2()) {
         super(position);
 
         this.name = name;
-        this.id = Player.players.length;
+        this.id = id;
 
-        Player.players.push(this);
+        Player.players.set(id, this);
     }
 
     removePlayer() {
-        Player.players.splice(this.id, 1);
+        Player.players.delete(this.id);
     }
 }

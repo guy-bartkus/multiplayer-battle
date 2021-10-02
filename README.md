@@ -31,7 +31,7 @@ After cloning, run `npm install` in root of project.
 `INIT` - This means user is ready to join game. Data: `{username: varchar}`  
 `ROTATE` - Change user rotation. Data: `rad: float32`  
 `MOVE` - Update move point. Apply force in direction. Data: `x: uint16, y: uint16`  
-`CHAT` - Relay to other players. Data: `msg: varchar`
+`CHAT` - Relay to other players. Data: `msg: varchar`  
 
 ### Client
 
