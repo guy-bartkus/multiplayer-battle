@@ -1,6 +1,7 @@
 import {prepareStartForm, loginOverlay} from './startup';
 import {generatePlayerName, randInt} from './helpers';
 import {MESSAGE_TYPE, initPlayer, sendChatMessage, decode, sendRotUpdate} from './modules/websocket';
+import Player from './modules/player';
 
 const siteLoader = document.getElementById('loader')!;
 
@@ -27,7 +28,7 @@ ws.addEventListener('message', e => {
         switch(type) {
             case MESSAGE_TYPE.NEW_PLY: 
             {
-                
+
             }
         }
     });

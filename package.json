@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
+    "start": "node . --prefix dist",
     "sbuild": "tsc",
     "cbuild": "webpack --config public/webpack.config.js --mode development",
     "cbuildp": "webpack --config public/webpack.config.js --mode production",
