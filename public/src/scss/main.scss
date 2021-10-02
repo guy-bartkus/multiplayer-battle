@@ -23,11 +23,7 @@ body {
   border: 0;
   border-radius: 5px;
   cursor: pointer;
-}
-.btn-primary {
-  background: $color-primary;
-  color: #fff;
-  text-shadow: 0 1px rgba(0, 0, 0, 0.9);
+  
 }
 .btn-primary:hover {
   background: $color-primary-light;
