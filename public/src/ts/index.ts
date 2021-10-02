@@ -9,6 +9,8 @@ const map_canvas = document.createElement('canvas');
 const camera_ctx = camera.getContext('2d')!;
 const map_ctx = camera.getContext('2d')!;
 
+const ass = "";
+
 const mouse = {
     x: 0,
     y: 0

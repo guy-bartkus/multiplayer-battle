@@ -7,7 +7,8 @@
     "sbuild": "tsc",
     "cbuild": "webpack --config public/webpack.config.js --mode development",
     "cbuildp": "webpack --config public/webpack.config.js --mode production",
-    "nodemon": "nodemon -e ts --exec npm run cbuild"
+    "nodemon": "nodemon -e ts --exec npm run cbuild",
+    "sass": "sass public/src/scss/main.scss public/src/scss/main.css"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +16,7 @@
   "dependencies": {
     "browserify": "^17.0.0",
     "express": "^4.17.1",
+    "style-loader": "^3.3.0",
     "ws": "^8.2.2"
   },
   "devDependencies": {
