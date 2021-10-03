@@ -15,12 +15,13 @@ const camera_ctx = camera.getContext('2d')!;
 const map_ctx = camera.getContext('2d')!;
 
 const mouse = {
-    x: 0,
-    y: 0,
+    pos: new Vec2(),
     d: 0,
     dC: false,
     down: false
 };
+
+let middle = new Vec2(camera.width/2, camera.height/2);
 
 let renderBackgroundAnimation = true;
 
@@ -98,18 +99,12 @@ ws.addEventListener('message', e => {
     });
 });
 
-
-
-camera.addEventListener('mousemove', e => {
+function calcMousePos(clientPos: Vec2): Vec2 {
     const rect = camera.getBoundingClientRect();
+    const rectVec = new Vec2(rect.left, rect.top);
 
-    mouse.dC = true;
-
-    mouse.x = e.clientX - rect.left;
-    mouse.y = e.clientY - rect.top;
-    mouse.d = Math.atan2(mouse.y - camera.height/2, mouse.x - camera.width/2)
-
-});
+    return clientPos.sub(rectVec);
+}
 
 
 window.addEventListener('resize', () => {
@@ -123,6 +118,8 @@ loginOverlay.addEventListener('click', e => {
 function resize() {
     camera.width = window.innerWidth;
     camera.height = window.innerHeight;
+
+    middle = new Vec2(camera.width/2, camera.height/2);
 }
 
 const dots: [number, number, number, number, number, number][] = [];
@@ -139,6 +136,8 @@ function addDot(x: number = randInt(0, 1920), y: number = randInt(0, 1080), xV: 
     ]);
 }
 
+const bullets: {pos: Vec2, dir: Vec2, traveled: number}[] = [];
+
 const dotsInterval = setInterval(addDot, 100);
 
 function render() {
@@ -152,21 +151,29 @@ function render() {
             renderImages();
         }
     } else {
-        camera_ctx.fillStyle = "#37bd37";
+        camera_ctx.fillStyle = "#37bd37AA";
 
         camera_ctx.beginPath();
-        camera_ctx.arc(mouse.x, mouse.y, 5, 0, Math.PI * 2);
+        camera_ctx.arc(mouse.pos.x, mouse.pos.y, 5, 0, Math.PI * 2);
         camera_ctx.fill();
         camera_ctx.closePath();
 
         camera_ctx.save();
         camera_ctx.setTransform(1, 0, 0, 1, camera.width/2, camera.height/2);
-        camera_ctx.rotate(Math.atan2(mouse.y - camera.height/2, mouse.x - camera.width/2));
+        camera_ctx.rotate(Math.atan2(mouse.pos.y - camera.height/2, mouse.pos.x - camera.width/2));
         camera_ctx.fillRect(-35, -15, 70, 30);
         camera_ctx.restore();
         
         camera_ctx.fillRect(imageTarget.x, imageTarget.y, 50, 50);
+
+        camera_ctx.fillStyle = "#37bd37";
         
+        for(let bullet of bullets) {
+            camera_ctx.beginPath();
+            camera_ctx.arc(bullet.pos.x, bullet.pos.y, 5, 0, Math.PI * 2);
+            camera_ctx.fill();
+            camera_ctx.closePath();
+        }
     }
 
     requestAnimationFrame(render);
@@ -257,16 +264,49 @@ function renderImages() {
 }
 
 function initGameHandlers() {
+    camera.addEventListener('mousemove', e => {
+        mouse.dC = true;
+    
+        mouse.pos = calcMousePos(new Vec2(e.clientX, e.clientY));
+        mouse.d = Math.atan2(mouse.pos.y - camera.height/2, mouse.pos.x - camera.width/2)
+    });
 
     camera.addEventListener('click', e => {
-        sendPosUpdate(ws, new Vec2(mouse.x, mouse.y));
+        const pos = calcMousePos(new Vec2(e.clientX, e.clientY));
+
+        sendPosUpdate(ws, new Vec2(pos.x, pos.y));
     });
+    
     camera.addEventListener('mousedown', e => {
+        const pos = calcMousePos(new Vec2(e.clientX, e.clientY));
+        const dir = pos.sub(middle).normalize();
+
+        bullets.push({
+            pos: middle.add(dir.mul(30)),
+            dir: dir,
+            traveled: 0
+        });
+        
         mouse.down = true;
     });
+
     camera.addEventListener('mouseup', e => {
         mouse.down = false;
     });
+
+    setInterval(() => {
+        for(let i = 0; i < bullets.length; i++) {
+            const bullet = bullets[i];
+
+            if(bullet.traveled > 1101) {
+                bullets.splice(i, 1);
+                continue;
+            }
+
+            bullet.pos = bullet.pos.add(bullet.dir.mul(10));
+            bullet.traveled += 10;
+        }
+    }, 20);
 
     setInterval(() => {
         if(mouse.dC) {
@@ -274,7 +314,7 @@ function initGameHandlers() {
             sendRotUpdate(ws, mouse.d);
         }
         if(mouse.down) {
-            sendPosUpdate(ws, new Vec2(mouse.x, mouse.y));
+            sendPosUpdate(ws, new Vec2(mouse.pos.x, mouse.pos.y));
         }
     }, 50);
 

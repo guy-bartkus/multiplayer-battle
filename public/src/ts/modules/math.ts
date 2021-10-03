@@ -15,8 +15,8 @@ export class Vec2 {
         return new Vec2(this.x - vec2.x, this.y - vec2.y);
     }
 
-    mul(mul: number): Vec2 {
-        return new Vec2(this.x * mul, this.y * mul);
+    mul(scalar: number): Vec2 {
+        return new Vec2(this.x * scalar, this.y * scalar);
     }
 
     div(vec2: Vec2): Vec2 {
