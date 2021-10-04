@@ -151,29 +151,29 @@ function render() {
             renderImages();
         }
     } else {
-        camera_ctx.fillStyle = "#37bd37AA";
-
-        camera_ctx.beginPath();
-        camera_ctx.arc(mouse.pos.x, mouse.pos.y, 5, 0, Math.PI * 2);
-        camera_ctx.fill();
-        camera_ctx.closePath();
-
-        camera_ctx.save();
-        camera_ctx.setTransform(1, 0, 0, 1, camera.width/2, camera.height/2);
-        camera_ctx.rotate(Math.atan2(mouse.pos.y - camera.height/2, mouse.pos.x - camera.width/2));
-        camera_ctx.fillRect(-35, -15, 70, 30);
-        camera_ctx.restore();
-        
-        camera_ctx.fillRect(imageTarget.x, imageTarget.y, 50, 50);
-
         camera_ctx.fillStyle = "#37bd37";
-        
+
         for(let bullet of bullets) {
             camera_ctx.beginPath();
             camera_ctx.arc(bullet.pos.x, bullet.pos.y, 5, 0, Math.PI * 2);
             camera_ctx.fill();
             camera_ctx.closePath();
         }
+
+        camera_ctx.fillStyle = "#37bd37AA";
+
+        camera_ctx.save();
+        camera_ctx.setTransform(1, 0, 0, 1, camera.width/2, camera.height/2);
+        camera_ctx.rotate(Math.atan2(mouse.pos.y - camera.height/2, mouse.pos.x - camera.width/2));
+        camera_ctx.fillRect(-35, -15, 70, 30);
+        camera_ctx.restore();
+
+        camera_ctx.fillStyle = "#4287f5";
+
+        camera_ctx.beginPath();
+        camera_ctx.arc(mouse.pos.x, mouse.pos.y, 5, 0, Math.PI * 2);
+        camera_ctx.fill();
+        camera_ctx.closePath();
     }
 
     requestAnimationFrame(render);
