@@ -36,18 +36,10 @@ export default class Player extends Entity {
     }
 
     static broadcastMessage(payload: ArrayBuffer) {
-        let value = Player.players.values().next();
-
-        while(!value.done) {
-            const player = value.value;
+        for (let [k, v] of Player.players) {
+            const player = v;
 
             player.socket.send(payload);
-
-            console.log(`Broadcast to ${player.name}`);
-
-            value = Player.players.values().next();
         }
-
-        console.log("Broadcast the message to all players!");
     }
 }
