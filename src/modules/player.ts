@@ -43,7 +43,11 @@ export default class Player extends Entity {
 
             player.socket.send(payload);
 
+            console.log(`Broadcast to ${player.name}`);
+
             value = Player.players.values().next();
         }
+
+        console.log("Broadcast the message to all players!");
     }
 }
