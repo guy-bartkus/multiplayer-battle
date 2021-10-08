@@ -14,43 +14,48 @@ const map_canvas = document.createElement('canvas');
 const camera_ctx = camera.getContext('2d')!;
 const map_ctx = camera.getContext('2d')!;
 
+const playerSize: number = 40;
+
+const _player = {
+    isAttack: false,
+    isCastQ: false,
+    isCastW: false,
+    isCastE: false,
+    isCastR: false,
+}
+
 const mouse = {
     pos: new Vec2(),
     d: 0,
     dC: false,
-    down: false
+    lDown: false,
+    rDown: false
 };
+
+const keyboard = {
+    qDown: false,
+    wDown: false,
+    eDown: false,
+    rDown: false
+}
+
 
 let middle = new Vec2(camera.width/2, camera.height/2);
 
 let renderBackgroundAnimation = true;
 
-let uList: string[] = [];
-
 function renderUserList() {
+    const nameList: string[] = [];
+
+    for(let [k, v] of Player.players) {
+        nameList.push(v.name);
+    }
+
     playerList.innerHTML = "";
 
-    for (let item of uList) {
+    for (let item of nameList) {
         playerList.innerHTML += `<li>${item}</li>`;
     }
-}
-
-function initUserList(fuck: string[]) {
-    uList = fuck;
-
-    renderUserList();
-}
-
-function deleteUser(user: number) {
-    uList.splice(user, 1);
-
-    renderUserList();
-}
-
-function addUser(user: string) {
-    uList.push(user);
-
-    renderUserList();
 }
 
 const ws = new WebSocket(`${(window.location.protocol === 'http:' ? 'ws' : 'wss')}://${window.location.host}`);
@@ -60,34 +65,34 @@ ws.addEventListener('message', e => {
         const [type, ...data] = decode(arrayBuffer);
 
         switch(type) {
-            case MESSAGE_TYPE.INIT: 
+            case MESSAGE_TYPE.INIT:
             {
                 const mapSize = data[0];
-                const userList = data[1];
+                const userList: [number, string][] = data[1];
 
                 console.log("Got INIT!");
                 
-                for(let username of userList) {
-                    new Player(username);
+                for(let [id, name] of userList) {
+                    new Player(id, name);
                 }
 
-                initUserList(userList);
+                renderUserList();
             }
                 break;
             case MESSAGE_TYPE.NEW_PLY:
                 {
-                    const username = data[0];
-                    addUser(username);
-                    console.log(`Add player with name ${username}`);
-                    new Player(username);
+                    const [id, name] = data;
+                    console.log(`Add player (${id}: ${name})`);
+                    new Player(id, name);
+                    renderUserList();
                 }
                 break;
             case MESSAGE_TYPE.DEL_PLY:
                 {
                     const playerID = data[0];
-                    deleteUser(playerID);
                     console.log(`Remove player with ID ${playerID}`);
-                    Player.players[playerID].removePlayer();
+                    Player.players.delete(playerID);
+                    renderUserList();
                 }
                 break;
             default:
@@ -123,6 +128,7 @@ function resize() {
 }
 
 const dots: [number, number, number, number, number, number][] = [];
+const clickLocations: [number, number, number, number, number, number][] = [];
 
 function addDot(x: number = randInt(0, 1920), y: number = randInt(0, 1080), xV: number = randInt(-2, 3), yV: number = randInt(-2, 3)) {
     if (!document.hasFocus()) return;
@@ -135,6 +141,19 @@ function addDot(x: number = randInt(0, 1920), y: number = randInt(0, 1080), xV: 
         1 //Current size
     ]);
 }
+
+function addClickLocation(x: number, y: number, xV: number, yV: number) {
+    if (!document.hasFocus()) return;
+    clickLocations.push([
+        x, //x
+        y, //y
+        xV,
+        yV,
+        150, //HSL hue
+        25 //Current size
+    ]);
+}
+
 
 const bullets: {pos: Vec2, dir: Vec2, traveled: number}[] = [];
 
@@ -159,24 +178,95 @@ function render() {
             camera_ctx.fill();
             camera_ctx.closePath();
         }
-
-        camera_ctx.fillStyle = "#37bd37AA";
-
-        camera_ctx.save();
-        camera_ctx.setTransform(1, 0, 0, 1, camera.width/2, camera.height/2);
-        camera_ctx.rotate(Math.atan2(mouse.pos.y - camera.height/2, mouse.pos.x - camera.width/2));
-        camera_ctx.fillRect(-35, -15, 70, 30);
-        camera_ctx.restore();
-
-        camera_ctx.fillStyle = "#4287f5";
-
-        camera_ctx.beginPath();
-        camera_ctx.arc(mouse.pos.x, mouse.pos.y, 5, 0, Math.PI * 2);
-        camera_ctx.fill();
-        camera_ctx.closePath();
+        
+        renderPlayer("#37bd37AA");
+        if (_player.isCastR) {
+            renderAbility();
+        }
+        renderMouse();
+        renderClickLocations();
     }
 
     requestAnimationFrame(render);
+}
+
+let rCastTime = 500;
+let rCastStart;
+let rCastEnd;
+
+function renderAbility() {
+    let curPercent = (rCastEnd - Date.now()) / rCastTime;
+    if (curPercent <= 0) {
+        return
+    }
+
+    
+    camera_ctx.fillStyle = "#f34";
+
+    camera_ctx.save();
+    camera_ctx.translate(camera.width/2, camera.height/2);
+    camera_ctx.rotate(Math.atan2(mouse.pos.y - camera.height/2, mouse.pos.x - camera.width/2) - (90 * Math.PI / 180));
+
+    let curWidth = (curPercent > .5) ? (50 / curPercent) - 50 : 50 * curPercent;
+
+    //camera_ctx.fillRect(-(curWidth / 2), playerSize, curWidth, 200 / curPercent);
+    camera_ctx.fillRect(-(curWidth / 2), playerSize, curWidth, 80 / curPercent);
+
+    camera_ctx.fillStyle = "#f83";
+    //camera_ctx.fillRect(-(curWidth / 2) / 2, playerSize, curWidth * .5, (100 / curPercent) * .5 );
+    camera_ctx.fillRect(-(curWidth / 2) / 3, playerSize, curWidth * .3333, (80 / curPercent) * .75 );
+
+    camera_ctx.restore(); 
+    
+}
+
+function renderPlayer(color) {
+    camera_ctx.fillStyle = color;
+
+    let eyeGap: number = 20;
+    let eyeSize: number = 10;
+
+    camera_ctx.save();
+    camera_ctx.translate(camera.width/2, camera.height/2);
+    camera_ctx.rotate(Math.atan2(mouse.pos.y - camera.height/2, mouse.pos.x - camera.width/2));
+
+    //body
+    camera_ctx.beginPath();
+    camera_ctx.arc(0, 0, playerSize, 0, Math.PI * 2);
+    camera_ctx.closePath();
+    camera_ctx.fill();
+
+    camera_ctx.fillStyle = "#fff";
+    
+    // angle * Math.PI/180
+
+    //left eye
+    camera_ctx.rotate(Math.PI -(eyeGap / 2));
+
+    camera_ctx.beginPath();
+    camera_ctx.arc(playerSize-(eyeSize / 2), 0, eyeSize, 0, Math.PI * 2);
+    camera_ctx.closePath();
+    camera_ctx.fill();
+
+    //right eye
+    camera_ctx.rotate(eyeGap);
+
+    camera_ctx.beginPath();
+    camera_ctx.arc(playerSize-(eyeSize / 2), 0, eyeSize, 0, Math.PI * 2);
+    camera_ctx.closePath();
+    camera_ctx.fill();
+
+    //camera_ctx.fillRect(-35, -15, 70, 30);
+    camera_ctx.restore();
+}
+
+function renderMouse() {
+    camera_ctx.fillStyle = "#4287f5";
+
+    camera_ctx.beginPath();
+    camera_ctx.arc(mouse.pos.x, mouse.pos.y, 5, 0, Math.PI * 2);
+    camera_ctx.fill();
+    camera_ctx.closePath();
 }
 
 
@@ -198,6 +288,37 @@ function renderDots() {
 
         if(dot[5] > 50) {
             dots.splice(i, 1);
+        }
+    }
+}
+
+function renderClickLocations() {
+    for(let i = 0; i < clickLocations.length; i++) {
+        const click = clickLocations[i];
+
+        // camera_ctx.fillStyle = `hsl(${dot[4]}, 100%, 50%, ${0.013333 * (50 - dot[5])})`;
+
+        // camera_ctx.beginPath();
+        // camera_ctx.arc(click[0], click[1], click[5], 0, Math.PI * 2);
+        // camera_ctx.closePath();
+        // camera_ctx.fill();
+
+        camera_ctx.beginPath();
+        camera_ctx.arc(click[0], click[1], click[5], 0, Math.PI*2);
+        camera_ctx.strokeStyle=`hsl(${click[4]}, 100%, 50%, ${0.013333 * (25 - click[5])})`;
+        camera_ctx.fillStyle="#FFFFFF";
+        camera_ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+        camera_ctx.stroke();
+        camera_ctx.fill();
+
+
+
+        click[0] += click[2];
+        click[1] += click[3];
+        click[5] -= 0.5;
+
+        if(click[5] <= 0) {
+            clickLocations.splice(i, 1);
         }
     }
 }
@@ -264,20 +385,62 @@ function renderImages() {
 }
 
 function initGameHandlers() {
+
+    document.oncontextmenu = function(e){
+        stopEvent(e);
+    }
+
+    document.addEventListener('keydown', e => {
+        switch (e.keyCode) {
+            case 82:
+                _player.isCastR = true;
+                rCastStart = Date.now();
+                rCastEnd = rCastStart + rCastTime;
+                
+                setTimeout(function(){
+                    _player.isCastR = false;
+                }, rCastTime)
+                break;
+            default:
+                break;
+        }
+    });
+
+
+    
+    function handleKeyUp(key) {
+        
+    }
+
     camera.addEventListener('mousemove', e => {
         mouse.dC = true;
     
         mouse.pos = calcMousePos(new Vec2(e.clientX, e.clientY));
-        mouse.d = Math.atan2(mouse.pos.y - camera.height/2, mouse.pos.x - camera.width/2)
+        mouse.d = Math.atan2(mouse.pos.y - camera.height/2, mouse.pos.x - camera.width/2);
+
     });
 
     camera.addEventListener('click', e => {
         const pos = calcMousePos(new Vec2(e.clientX, e.clientY));
-
+        addClickLocation(e.clientX, e.clientY, 0, 0);
         sendPosUpdate(ws, new Vec2(pos.x, pos.y));
     });
     
     camera.addEventListener('mousedown', e => {
+        
+        if (e.button == 0) {
+            handleLeftMouseDown(e);
+        } else {
+            handleRightMouseDown(e);
+        }
+    });
+
+    function handleLeftMouseDown(e) {
+        mouse.lDown = true;
+    }
+
+    function handleRightMouseDown(e) {
+        mouse.rDown = true;
         const pos = calcMousePos(new Vec2(e.clientX, e.clientY));
         const dir = pos.sub(middle).normalize();
 
@@ -286,12 +449,14 @@ function initGameHandlers() {
             dir: dir,
             traveled: 0
         });
-        
-        mouse.down = true;
-    });
+    }
 
     camera.addEventListener('mouseup', e => {
-        mouse.down = false;
+        if (e.button == 0) {
+            mouse.lDown = false;
+        } else {
+            mouse.rDown = false;
+        }
     });
 
     setInterval(() => {
@@ -313,7 +478,7 @@ function initGameHandlers() {
             mouse.dC = false;
             sendRotUpdate(ws, mouse.d);
         }
-        if(mouse.down) {
+        if(mouse.lDown) {
             sendPosUpdate(ws, new Vec2(mouse.pos.x, mouse.pos.y));
         }
     }, 50);
@@ -338,3 +503,12 @@ render();
 setTimeout(function(){
     siteLoader.classList.add('hidden');
 }, 500);
+
+
+
+function stopEvent(event){
+    if(event.preventDefault != undefined)
+        event.preventDefault();
+    if(event.stopPropagation != undefined)
+        event.stopPropagation();
+}

@@ -1,5 +1,5 @@
 import {Vec2} from './math'
-import {decodeBinaryStringArray} from './helpers'; 
+import {decodePlayerList} from './helpers'; 
 
 export enum MESSAGE_TYPE {
     NULL = 0,
@@ -22,7 +22,7 @@ export const decode = (payload: ArrayBuffer): any[] => {
         case MESSAGE_TYPE.INIT:
             {
                 const mapSize = dv.getUint16(0);
-                const userList = decodeBinaryStringArray(msg.slice(2, msg.byteLength));
+                const userList = decodePlayerList(msg.slice(2, msg.byteLength));
                 return [type, mapSize, userList];
             }
             break;
@@ -32,8 +32,9 @@ export const decode = (payload: ArrayBuffer): any[] => {
         case MESSAGE_TYPE.NEW_PLY:
             {
                 const utf8decoder = new TextDecoder();
-                const username = utf8decoder.decode((new Uint8Array(msg)));
-                return [type, username];
+                const id = dv.getUint8(0);
+                const username = utf8decoder.decode((new Uint8Array(msg.slice(1, msg.byteLength))));
+                return [type, id, username];
             }
             break;
         case MESSAGE_TYPE.DEL_PLY:
@@ -65,6 +66,8 @@ export const sendRotUpdate = (socket: WebSocket, rad: number) => {
 
     socket.send(payload);
 }
+
+// export const sendAbilityCast = (socket: WebSocket, )
 
 export const sendPosUpdate = (socket: WebSocket, pos: Vec2) => {
     // const payload = new ArrayBuffer(5);

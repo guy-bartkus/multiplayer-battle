@@ -2,7 +2,7 @@ import ws, {WebSocket} from 'ws';
 import settings from '../game-settings';
 import {Server} from 'http';
 import Player from './player';
-import {encodeBinaryStringArray} from './helpers';
+import {encodePlayerList} from './helpers';
 
 export enum MESSAGE_TYPE {
     NULL = 0,
@@ -25,7 +25,6 @@ export const init = (server: Server) => {
         socket.binaryType = "arraybuffer";
 
         const player = new Player(socket, "Unnamed User");
-        const id = player.id;
         
         // console.log(`${req.socket.remoteAddress} connected!`);
 
@@ -47,7 +46,7 @@ export const init = (server: Server) => {
                         console.log(`${data[0]} joined!`);
                         player.name = data[0];
                         player.addToList();
-                        broadcastNewPlayer(player.name);
+                        broadcastNewPlayer(player);
                     }
                     break;
                 case MESSAGE_TYPE.ROTATE:
@@ -101,19 +100,17 @@ export const decode = (payload: ArrayBuffer): any[] => {
 }
 
 export const sendInitMessage = (socket: WebSocket) => { //MESSAGE_TYPE: Uint8, MapSize: Uint16
-    const players: string[] = [];
+    const players: [number, string][] = [];
 
-    let value = Player.players.values().next();
+    let len = 0;
 
-    while(!value.done) {
-        const player = value.value;
+    for (let [k, v] of Player.players) {
+        players.push([v.id, v.name]);
 
-        players.push(player.name);
-
-        value = Player.players.values().next();
+        len += v.name.length + 1;
     }
 
-    const playersBin = encodeBinaryStringArray(players);
+    const playersBin = encodePlayerList(players, len);
     const payload = new Uint8Array(3+playersBin.byteLength);
 
     payload.set(playersBin, 3);
@@ -150,14 +147,15 @@ const broadcastPlayerLeft = (playerID: number) => {
     Player.broadcastMessage(message);
 }
 
-const broadcastNewPlayer = (username: string) => {
-    const message = new ArrayBuffer(1+username.length);
+const broadcastNewPlayer = (player: Player) => {
+    const message = new ArrayBuffer(2+player.name.length);
     const dv = new DataView(message);
 
     dv.setUint8(0, MESSAGE_TYPE.NEW_PLY);
+    dv.setUint8(1, player.id);
 
-    for(let i = 0; i < username.length; i++) {
-        dv.setUint8(i+1, username.charCodeAt(i));
+    for(let i = 0; i < player.name.length; i++) {
+        dv.setUint8(i+2, player.name.charCodeAt(i));
     }
 
     Player.broadcastMessage(message);

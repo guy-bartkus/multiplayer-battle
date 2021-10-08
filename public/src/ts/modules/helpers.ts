@@ -231,48 +231,45 @@ export const randInt = (min:number, max:number): number => {
     return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
 
-export const encodeBinaryStringArray = (arr: string[]): ArrayBuffer => {
+export const encodePlayerList = (arr: [number, string][], len: number): Uint8Array => {
     const enc = new TextEncoder();
-    let len = arr.length;
 
-    for(let item of arr) {
-        len += item.length;
-    }
-
-    const combined = new Uint8Array(len);
+    const combined = new Uint8Array(len+arr.length);
 
     let i = 0;
     let i2 = 0;
 
-    while(i < len) {
-        const str = enc.encode(arr[i2]);
-        combined.set([str.byteLength], i);
-        combined.set(str, i+1);
+    while(i2 < arr.length) {
+        const str = enc.encode(arr[i2][1]);
+        combined.set([arr[i2][0]], i) //Player ID
+        combined.set([str.byteLength+1], i+1); //+1 because one byte for player id
+        combined.set(str, i+2); //Player name
 
         i2++;
-        i += str.byteLength+1;
+        i += str.byteLength+2; //+2 instead of +1 because next iteration needs to start at proper index.
     }
 
-    return combined.buffer;
+    return combined;
 }
 
-export const decodeBinaryStringArray = (aB: ArrayBuffer): string[] => {
+export const decodePlayerList = (aB: ArrayBuffer): [number, string][] => {
     const dec = new TextDecoder("utf-8");
     const dv = new DataView(aB);
 
-    const strArr: string[] = [];
+    const plyArr: [number, string][] = [];
 
     let i = 0;
 
     while(i < aB.byteLength) {
-        const uLen = dv.getUint8(i);
+        const id = dv.getUint8(i);
+        const uLen = dv.getUint8(i+1);
 
-        strArr.push( dec.decode(aB.slice(i+1, i+uLen+1)) );
+        plyArr.push( [id, dec.decode(aB.slice(i+2, i+uLen+1))] );
 
         i += uLen+1;
     }
 
-    return strArr;
+    return plyArr;
 }
 
 export function isASCII(str) {
